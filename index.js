@@ -1,5 +1,6 @@
 const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
+const { v1: uuid } = require("uuid");
 
 let persons = [
   {
@@ -43,8 +44,18 @@ const typeDefs = `
     allPersons: [Person!]!
     findPerson(name: String!): Person
   }
+
+  type Mutation {
+    addPerson(
+      name: String!
+      phone: String
+      street: String!
+      city: String!
+    ): Person
+  }
 `;
 
+// The resolvers object defines how the server responds to requests for the fields defined in the schema
 const resolvers = {
   Query: {
     personCount: () => persons.length,
@@ -72,6 +83,14 @@ const resolvers = {
         street: root.street,
         city: root.city,
       };
+    },
+  },
+  // Implementing the mutation addPerson resolver to add a new person to the persons array and return the added person
+  Mutation: {
+    addPerson: (root, args) => {
+      const person = { ...args, id: uuid() };
+      persons = persons.concat(person);
+      return person;
     },
   },
 };
