@@ -1,5 +1,6 @@
 const { ApolloServer } = require("@apollo/server");
 const { startStandaloneServer } = require("@apollo/server/standalone");
+const { GraphQLError } = require("graphql");
 const { v1: uuid } = require("uuid");
 
 let persons = [
@@ -88,6 +89,16 @@ const resolvers = {
   // Implementing the mutation addPerson resolver to add a new person to the persons array and return the added person
   Mutation: {
     addPerson: (root, args) => {
+      if (persons.find((p) => p.name === args.name)) {
+        // GraphQLError constructor takes an error message as the first argument and an extensions object as the second argument
+        throw new GraphQLError("Name must be unique", {
+          extensions: {
+            code: "BAD_USER_INPUT",
+            invalidArgs: args.name,
+          },
+        });
+      }
+
       const person = { ...args, id: uuid() };
       persons = persons.concat(person);
       return person;
