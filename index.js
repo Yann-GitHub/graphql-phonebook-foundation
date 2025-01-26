@@ -25,11 +25,16 @@ let persons = [
 ];
 
 const typeDefs = `
+
+  type Address {
+    street: String!
+    city: String!
+  }
+
   type Person {
     name: String!
     phone: String
-    street: String!
-    city: String! 
+    address: Address!
     id: ID!
   }
 
@@ -45,6 +50,29 @@ const resolvers = {
     personCount: () => persons.length,
     allPersons: () => persons,
     findPerson: (root, args) => persons.find((p) => p.name === args.name),
+  },
+  // The resolver for the Person type is not needed, as the fields of the Person type are simple fields
+  // Person: {
+  //   name: (root) => root.name,
+  //   phone: (root) => root.phone,
+  //   street: (root) => root.street,
+  //   city: (root) => root.city,
+  //   id: (root) => root.id
+  // },
+
+  // Possible to hardcode the street field for the Person type or other types
+  // Person: {
+  //   street: (root) => "Broadway 1",
+  // },
+
+  // Possible to modify the resolver for adding a new field to the Person type without changing the schema definition
+  Person: {
+    address: (root) => {
+      return {
+        street: root.street,
+        city: root.city,
+      };
+    },
   },
 };
 
