@@ -33,6 +33,11 @@ const typeDefs = `
     city: String!
   }
 
+  enum YesNo {
+    YES
+    NO
+  }
+
   type Person {
     name: String!
     phone: String
@@ -42,7 +47,7 @@ const typeDefs = `
 
   type Query {
     personCount: Int!
-    allPersons: [Person!]!
+    allPersons(phone: YesNo): [Person!]!
     findPerson(name: String!): Person
   }
 
@@ -60,7 +65,16 @@ const typeDefs = `
 const resolvers = {
   Query: {
     personCount: () => persons.length,
-    allPersons: () => persons,
+    // The allPersons resolver takes an optional argument phone, which is of the enum type YesNo
+    // The resolver returns all persons if the phone argument is not given
+    allPersons: (root, args) => {
+      if (!args.phone) {
+        return persons;
+      }
+      const byPhone = (person) =>
+        args.phone === "YES" ? person.phone : !person.phone;
+      return persons.filter(byPhone);
+    },
     findPerson: (root, args) => persons.find((p) => p.name === args.name),
   },
   // The resolver for the Person type is not needed, as the fields of the Person type are simple fields
@@ -77,7 +91,8 @@ const resolvers = {
   //   street: (root) => "Broadway 1",
   // },
 
-  // Possible to modify the resolver for adding a new field to the Person type without changing the schema definition
+  // Possible to modify the resolver for adding a new field to the Person type
+  // The field address is formed by using a self-defined resolver.
   Person: {
     address: (root) => {
       return {
