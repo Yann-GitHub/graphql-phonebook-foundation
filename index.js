@@ -58,6 +58,7 @@ const typeDefs = `
       street: String!
       city: String!
     ): Person
+
     editNumber(
       name: String!
       phone: String!
@@ -69,6 +70,7 @@ const typeDefs = `
 const resolvers = {
   Query: {
     personCount: () => persons.length,
+
     // The allPersons resolver takes an optional argument phone, which is of the enum type YesNo
     // The resolver returns all persons if the phone argument is not given
     allPersons: (root, args) => {
@@ -81,6 +83,7 @@ const resolvers = {
     },
     findPerson: (root, args) => persons.find((p) => p.name === args.name),
   },
+
   // The resolver for the Person type is not needed, as the fields of the Person type are simple fields
   // Person: {
   //   name: (root) => root.name,
@@ -105,6 +108,17 @@ const resolvers = {
       };
     },
   },
+
+  // Variant syntax for the resolver of the address field
+  // Person: {
+  //   address: ({ street, city}) => {
+  //     return {
+  //       street,
+  //       city
+  //     };
+  //   },
+  // },
+
   // Implementing the mutation addPerson resolver to add a new person to the persons array and return the added person
   Mutation: {
     addPerson: (root, args) => {
@@ -122,6 +136,7 @@ const resolvers = {
       persons = persons.concat(person);
       return person;
     },
+
     // Implementing the mutation editNumber resolver to edit the phone number of a person
     editNumber: (root, args) => {
       const person = persons.find((p) => p.name === args.name);
